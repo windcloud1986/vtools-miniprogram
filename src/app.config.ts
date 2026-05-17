@@ -1,0 +1,36 @@
+import type { AppConfig } from '@tarojs/taro'
+
+const config: AppConfig = {
+  pages: [
+    'pages/index/index',
+    'pages/my/index',
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTitleText: '轻链素材',
+    navigationBarTextStyle: 'black',
+  },
+  tabBar: {
+    color: '#666666',
+    selectedColor: '#1890ff',
+    backgroundColor: '#ffffff',
+    borderStyle: 'black',
+    list: [
+      {
+        pagePath: 'pages/index/index',
+        text: '首页',
+        iconPath: 'assets/home.png',
+        selectedIconPath: 'assets/home-active.png',
+      },
+      {
+        pagePath: 'pages/my/index',
+        text: '我的',
+        iconPath: 'assets/user.png',
+        selectedIconPath: 'assets/user-active.png',
+      },
+    ],
+  },
+}
+
+export default config
