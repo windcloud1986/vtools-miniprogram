@@ -24,6 +24,8 @@ function callContainer(path: string, method: string, data?: Record<string, unkno
       reject(new Error('请求超时，请稍后重试'))
     }, 120000)
 
+    console.log('[callContainer] 发起请求:', path, method, JSON.stringify(data))
+
     wx.cloud.callContainer({
       config: { env: CLOUD_ENV },
       path,
@@ -34,15 +36,26 @@ function callContainer(path: string, method: string, data?: Record<string, unkno
       },
       method,
       data,
-      success: (res: { result: string | Record<string, unknown> | undefined }) => {
-        console.log('[callContainer]', path, JSON.stringify(res.result))
+      success: (res: { result?: string | Record<string, unknown> }) => {
+        console.log('[callContainer] success:', path, 'resultType:', typeof res.result, 'result:', JSON.stringify(res.result))
         clearTimeout(timeoutId)
         if (!res.result) {
+          console.error('[callContainer] result为空, res:', JSON.stringify(res))
           reject(new Error('请求返回为空'))
           return
         }
-        const parsed = typeof res.result === 'string' ? JSON.parse(res.result) : res.result
-        resolve(parsed as Record<string, unknown>)
+        if (typeof res.result === 'string' && res.result.trim() === '') {
+          console.error('[callContainer] result为空字符串, res:', JSON.stringify(res))
+          reject(new Error('请求返回为空'))
+          return
+        }
+        try {
+          const parsed = typeof res.result === 'string' ? JSON.parse(res.result) : res.result
+          resolve(parsed as Record<string, unknown>)
+        } catch (e) {
+          console.error('[callContainer] JSON解析失败:', e, 'raw:', res.result)
+          reject(new Error('返回数据解析失败'))
+        }
       },
       fail: (err: { errMsg: string }) => {
         clearTimeout(timeoutId)
